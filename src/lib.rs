@@ -1,5 +1,5 @@
-use sqlx::{Connection, PgConnection};
 use crate::configurations::get_configuration;
+use sqlx::{Connection, PgConnection};
 
 pub mod configurations;
 pub mod routes;

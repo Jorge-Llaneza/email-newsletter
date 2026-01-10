@@ -1,7 +1,7 @@
 use email_newsletter;
 use email_newsletter::configurations::get_configuration;
+use sqlx::{Connection, PgPool};
 use std::net::TcpListener;
-use sqlx::{Connection, PgConnection, PgPool};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

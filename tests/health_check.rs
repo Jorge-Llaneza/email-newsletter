@@ -1,10 +1,9 @@
-use email_newsletter::configurations::{get_configuration, DatabaseSettings};
-use sqlx::{Connection, PgConnection, PgPool};
-use std::net::{SocketAddr, TcpListener};
-use reqwest::get;
-use tokio;
+use email_newsletter::configurations::get_configuration;
 use email_newsletter::get_db_connection;
 use email_newsletter::startup::run;
+use sqlx::{Connection, PgPool};
+use std::net::TcpListener;
+use tokio;
 
 #[tokio::test]
 async fn health_check_works() -> std::io::Result<()> {
@@ -73,16 +72,15 @@ async fn subscribe_returns_a_400_for_invalid_form_data() {
 }
 
 async fn spawn_app() -> TestApp {
-    let listener = TcpListener::bind("127.0.0.1:0")
-        .expect("Failed to bind random port");
+    let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
     let configuration = get_configuration().expect("Failed to read configuration.");
     let connection_pool = PgPool::connect(&configuration.database.connection_string())
-    .await.expect("Failed to connect to PostgresSQL database.");
+        .await
+        .expect("Failed to connect to PostgresSQL database.");
 
-    let server = run(listener, connection_pool.clone())
-        .expect("Failed to bind address");
+    let server = run(listener, connection_pool.clone()).expect("Failed to bind address");
     let _ = tokio::spawn(server);
 
     TestApp {
