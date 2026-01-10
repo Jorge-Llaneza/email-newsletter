@@ -1,6 +1,5 @@
 use std::net::SocketAddr;
 use tokio;
-use tokio::net::TcpListener;
 
 #[tokio::test]
 async fn health_check_works() -> std::io::Result<()> {
@@ -58,7 +57,7 @@ fn spawn_app() -> SocketAddr {
     let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
     let app_address = listener.local_addr().unwrap();
 
-    let server = email_newsletter::run(listener).expect("App could't run");
+    let server = email_newsletter::startup::run(listener).expect("App could't run");
     let _ = tokio::spawn(server);
     app_address
 }
