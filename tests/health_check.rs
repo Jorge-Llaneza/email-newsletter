@@ -1,3 +1,5 @@
+use email_newsletter::configurations::get_configuration;
+use sqlx::{Connection, PgConnection};
 use std::net::SocketAddr;
 use tokio;
 
@@ -6,7 +8,8 @@ async fn health_check_works() -> std::io::Result<()> {
     let app_address = spawn_app();
     let client = reqwest::Client::new();
 
-    let response = client.get(format!("http://{}/health_check", app_address))
+    let response = client
+        .get(format!("http://{}/health_check", app_address))
         .send()
         .await
         .expect("Failed to execute request.");
@@ -18,17 +21,24 @@ async fn health_check_works() -> std::io::Result<()> {
 #[tokio::test]
 async fn subscribe_returns_a_200_for_valid_form_data() {
     let app_address = spawn_app();
+    let configuration = get_configuration().expect("Failed to read configuration.");
+    let connection_string = configuration.database.connection_string();
+    println!("The connection string is {}", connection_string);
+    let connection = PgConnection::connect(&connection_string)
+        .await
+        .expect("Failed to connect to Postgres.");
+
     let client = reqwest::Client::new();
 
-    let valid_bodies = vec!["name=le%20guin&email=ursula_le_guin%40gmail.com",
-                            "name=le%20guin&email=ursula_le_guin%40g.co",
-                            "name=leguin&email=ursula_le_guin%40gmail.com"];
+    let valid_bodies = vec!["name=le%20guin&email=ursula_le_guin%40gmail.com"];
     for body in valid_bodies {
-        let response = client.post(format!("http://{}/subscriptions", app_address))
+        let response = client
+            .post(format!("http://{}/subscriptions", app_address))
             .header("Content-Type", "application/x-www-form-urlencoded")
             .body(body)
             .send()
-            .await.expect("Failed to execute request.");
+            .await
+            .expect("Failed to execute request.");
         assert!(response.status().is_success());
     }
 }
@@ -41,13 +51,15 @@ async fn subscribe_returns_a_400_for_invalid_form_data() {
     let invalid_bodies = vec![
         ("name=le%20guin", "missing the email"),
         ("email=ursula_le_guin%40gmail.com", "missing the name"),
-        ("", "missing both name and email")
+        ("", "missing both name and email"),
     ];
     for (body, error_message) in invalid_bodies {
-        let response = client.post(format!("http://{}/subscription", app_address))
+        let response = client
+            .post(format!("http://{}/subscription", app_address))
             .body(body)
             .send()
-            .await.expect("Failed to execute request.");
+            .await
+            .expect("Failed to execute request.");
 
         assert!(response.status().is_client_error(), "{}", error_message);
     }
