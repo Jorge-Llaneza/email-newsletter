@@ -5,6 +5,7 @@ pub mod configurations;
 pub mod routes;
 pub mod startup;
 
+///gets a connection to the development Postgres db
 pub async fn get_db_connection() -> PgConnection {
     let configuration = get_configuration().expect("Failed to read configuration");
     PgConnection::connect(&configuration.database.connection_string())

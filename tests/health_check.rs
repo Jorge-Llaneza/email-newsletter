@@ -1,5 +1,4 @@
-use email_newsletter::configurations::{DatabaseSettings, get_configuration};
-use email_newsletter::get_db_connection;
+use email_newsletter::configurations::{get_configuration, DatabaseSettings};
 use email_newsletter::startup::run;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
@@ -22,7 +21,6 @@ async fn health_check_works() -> std::io::Result<()> {
 
 #[tokio::test]
 async fn subscribe_returns_a_200_for_valid_form_data() {
-    let connection = get_db_connection().await;
     let app = spawn_app().await;
 
     let client = reqwest::Client::new();
@@ -38,9 +36,8 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
             .expect("Failed to execute request.");
         assert!(response.status().is_success());
     }
-    let mut connection = get_db_connection().await;
     let saved = sqlx::query!("SELECT email, name FROM subscriptions")
-        .fetch_one(&mut connection)
+        .fetch_one(&app.db_pool)
         .await
         .expect("Failed to fetch saved subscription.");
 
@@ -78,6 +75,10 @@ async fn spawn_app() -> TestApp {
     let mut configuration = get_configuration().expect("Failed to read configuration.");
     configuration.database.database_name = uuid::Uuid::new_v4().to_string();
     let connection_pool = configure_database(&configuration.database).await;
+    sqlx::migrate!("./migrations") // <--- This macro applies migrations
+        .run(&connection_pool)
+        .await
+        .expect("Failed to migrate the database");
 
     let server = run(listener, connection_pool.clone()).expect("Failed to bind address");
     let _ = tokio::spawn(server);
