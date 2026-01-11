@@ -1,4 +1,4 @@
-use email_newsletter::configurations::{get_configuration, DatabaseSettings};
+use email_newsletter::configurations::{DatabaseSettings, get_configuration};
 use email_newsletter::startup::run;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
