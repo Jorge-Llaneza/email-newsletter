@@ -1,9 +1,12 @@
 use actix_web::{HttpResponse, web};
-use env_logger::Env;
 use sqlx::PgPool;
 
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
-    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+    log::info!(
+                "Adding '{}' '{}' as a new subscriber",
+                form.name,
+                form.email
+            );
     match sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)

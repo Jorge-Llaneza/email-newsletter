@@ -1,7 +1,7 @@
 use email_newsletter;
 use email_newsletter::configurations::get_configuration;
 use env_logger::Env;
-use sqlx::{PgPool};
+use sqlx::PgPool;
 use std::net::TcpListener;
 
 #[actix_web::main]
