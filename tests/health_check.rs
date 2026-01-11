@@ -7,7 +7,6 @@ use tokio;
 
 #[tokio::test]
 async fn health_check_works() -> std::io::Result<()> {
-    let connection = get_db_connection().await;
     let app = spawn_app().await;
     let client = reqwest::Client::new();
 
