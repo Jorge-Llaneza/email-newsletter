@@ -1,5 +1,4 @@
 use actix_web::{HttpResponse, web};
-use env_logger::Env;
 use sqlx::PgPool;
 use tracing::Instrument;
 use uuid::Uuid;

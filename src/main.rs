@@ -1,4 +1,3 @@
-use email_newsletter;
 use email_newsletter::configurations::get_configuration;
 use sqlx::PgPool;
 use std::net::TcpListener;
