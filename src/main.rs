@@ -1,15 +1,16 @@
 use email_newsletter::configurations::get_configuration;
+use email_newsletter::telemetry;
 use sqlx::PgPool;
 use std::net::TcpListener;
-mod telemetry;
+use secrecy::ExposeSecret;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let subscriber = telemetry::get_subscriber("zero2prod".into(), "info".into());
+    let subscriber = telemetry::get_subscriber("zero2prod".into(), "info".into(), std::io::stdout);
     telemetry::init_subscriber(subscriber);
 
     let configuration = get_configuration().expect("Failed to read configuration");
-    let db_pool = PgPool::connect(&configuration.database.connection_string())
+    let db_pool = PgPool::connect(&configuration.database.connection_string().expose_secret())
         .await
         .expect("Failed to connect to Postgres");
 
