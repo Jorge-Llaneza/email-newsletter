@@ -25,6 +25,7 @@ pub async fn insert_subscriber(
     pool: &PgPool,
     form: &FormData
 ) -> Result<(), sqlx::Error> {
+    let mut transaction = pool.begin().await?;
     sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)
@@ -35,12 +36,14 @@ pub async fn insert_subscriber(
         form.name,
         chrono::Utc::now()
         )
-        .execute(pool)
+        .execute(&mut *transaction)
         .await
         .map_err(|e| {
             tracing::error!("Failed to execute query: {:?}", e);
             e
         })?;
+    
+        transaction.commit().await?;
         Ok(())
 }
 

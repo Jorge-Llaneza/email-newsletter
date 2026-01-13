@@ -6,11 +6,11 @@ use secrecy::ExposeSecret;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let subscriber = telemetry::get_subscriber("zero2prod".into(), "info".into(), std::io::stdout);
+    let subscriber = telemetry::get_subscriber("Email-Newsletter".into(), "info".into(), std::io::stdout);
     telemetry::init_subscriber(subscriber);
 
     let configuration = get_configuration().expect("Failed to read configuration");
-    let db_pool = PgPool::connect(&configuration.database.connection_string().expose_secret())
+    let db_pool = PgPool::connect(configuration.database.connection_string().expose_secret())
         .await
         .expect("Failed to connect to Postgres");
 
