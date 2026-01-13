@@ -16,6 +16,7 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }
+// force refresh
 
 #[tracing::instrument(
     name = "Saving new subscriber details in the database",
@@ -23,9 +24,8 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
 )]
 pub async fn insert_subscriber(
     pool: &PgPool,
-    form: &FormData
+    form: &FormData,
 ) -> Result<(), sqlx::Error> {
-    let mut transaction = pool.begin().await?;
     sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)
@@ -35,16 +35,14 @@ pub async fn insert_subscriber(
         form.email,
         form.name,
         chrono::Utc::now()
-        )
-        .execute(&mut *transaction)
+    )
+        .execute(pool) // Now the macro knows it's talking to Postgres
         .await
         .map_err(|e| {
             tracing::error!("Failed to execute query: {:?}", e);
             e
         })?;
-    
-        transaction.commit().await?;
-        Ok(())
+    Ok(())
 }
 
 #[derive(serde::Deserialize)]

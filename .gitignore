@@ -17,11 +17,6 @@ cargo-timing.html
 # BUT do not ignore the example template
 !.env.example
 
-# --- SQLx ---
-# If you use SQLx offline mode, do NOT ignore target/sqlx (handled by /target/)
-# But do ignore temporary query artifacts if they appear
-.sqlx/
-
 # --- IDEs / Editors ---
 .idea/
 *.iml
