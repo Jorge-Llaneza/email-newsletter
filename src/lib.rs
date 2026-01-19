@@ -1,5 +1,5 @@
-use secrecy::ExposeSecret;
 use crate::configurations::get_configuration;
+use secrecy::ExposeSecret;
 use sqlx::{Connection, PgConnection};
 
 pub mod configurations;

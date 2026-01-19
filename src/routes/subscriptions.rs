@@ -22,10 +22,7 @@ pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> Ht
     name = "Saving new subscriber details in the database",
     skip(form, pool)
 )]
-pub async fn insert_subscriber(
-    pool: &PgPool,
-    form: &FormData,
-) -> Result<(), sqlx::Error> {
+pub async fn insert_subscriber(pool: &PgPool, form: &FormData) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)
@@ -36,12 +33,12 @@ pub async fn insert_subscriber(
         form.name,
         chrono::Utc::now()
     )
-        .execute(pool) // Now the macro knows it's talking to Postgres
-        .await
-        .map_err(|e| {
-            tracing::error!("Failed to execute query: {:?}", e);
-            e
-        })?;
+    .execute(pool) // Now the macro knows it's talking to Postgres
+    .await
+    .map_err(|e| {
+        tracing::error!("Failed to execute query: {:?}", e);
+        e
+    })?;
     Ok(())
 }
 

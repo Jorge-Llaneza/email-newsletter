@@ -1,12 +1,13 @@
 use email_newsletter::configurations::get_configuration;
 use email_newsletter::telemetry;
+use secrecy::ExposeSecret;
 use sqlx::PgPool;
 use std::net::TcpListener;
-use secrecy::ExposeSecret;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let subscriber = telemetry::get_subscriber("Email-Newsletter".into(), "info".into(), std::io::stdout);
+    let subscriber =
+        telemetry::get_subscriber("Email-Newsletter".into(), "info".into(), std::io::stdout);
     telemetry::init_subscriber(subscriber);
 
     let configuration = get_configuration().expect("Failed to read configuration");
