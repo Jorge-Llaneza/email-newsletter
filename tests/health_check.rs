@@ -1,4 +1,4 @@
-use email_newsletter::configurations::{get_configuration, DatabaseSettings};
+use email_newsletter::configurations::{DatabaseSettings, get_configuration};
 use email_newsletter::startup::run;
 use email_newsletter::telemetry;
 use email_newsletter::telemetry::init_subscriber;
