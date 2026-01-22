@@ -21,6 +21,9 @@ services:
       - path: /
 
     envs:
+      - key: APP_ENVIRONMENT
+        scope: RUN_TIME
+        value: production
       - key: APP_DATABASE__USERNAME
         scope: RUN_TIME
         value: ${email-newsletter.USERNAME}
